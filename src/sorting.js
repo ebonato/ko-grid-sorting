@@ -23,7 +23,7 @@ define(['module', 'ko-grid', 'stringifyable'], function (module, koGrid, stringi
 
             function defaultComparator(column) {
                 var propertyName = column.property;
-                var accessor = row => valueOf(row[propertyName]);
+                var accessor = row => valueOf(propertyName.indexOf('.') == -1 ? row[propertyName] : eval('row.'+ propertyName));
                 stringifyable.makeStringifyable(accessor, () => stringifyable.functions.propertyAccessor(column.property).stringifyable);
 
                 return stringifyable.comparators.natural.onResultOf(accessor);
