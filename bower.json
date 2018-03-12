@@ -2,7 +2,7 @@
   "name": "ko-grid-sorting",
   "main": "dist/ko-grid-sorting.js",
   "description": "A ko-grid extension to sort by column.",
-  "authors": ["Ben Schulz (https://github.com/benschulz)"],
+  "authors": ["Eduardo Bonato (https://github.com/ebonato)"],
   "license": "BSD-3-Clause",
   "keywords": [
     "ko-grid",
@@ -10,12 +10,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "http://github.com/benschulz/ko-grid-sorting.git"
+    "url": "http://github.com/ebonato/ko-grid-sorting.git"
   },
   "dependencies": {
-    "ko-grid": "benschulz/ko-grid"
+    "ko-grid": "ebonato/ko-grid"
   },
   "devDependencies": {
-    "stringifyable": "benschulz/stringifyable"
+    "stringifyable": "ebonato/stringifyable"
   }
 }
