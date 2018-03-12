@@ -14,7 +14,7 @@
  */
 var onefold_js, stringifyable, ko_grid_sorting_sorting, ko_grid_sorting;
 onefold_js = function () {
-  var onefold_js_objects, onefold_js_arrays, onefold_js_functions, onefold_js_strings, onefold_js_internal, onefold_js;
+  var onefold_js_objects, onefold_js_arrays, onefold_js_strings, onefold_js_internal, onefold_js;
   onefold_js_objects = function () {
     return {
       areEqual: areEqual,
@@ -175,25 +175,6 @@ onefold_js = function () {
       return destination;
     }
   }(onefold_js_objects);
-  onefold_js_functions = function () {
-    var constant = function (x) {
-      return function () {
-        return x;
-      };
-    };
-    return {
-      // TODO with arrow functions these can go away
-      true: constant(true),
-      false: constant(false),
-      nop: constant(undefined),
-      null: constant(null),
-      zero: constant(0),
-      constant: constant,
-      identity: function (x) {
-        return x;
-      }
-    };
-  }();
   onefold_js_strings = {
     convertCamelToHyphenCase: function (camelCased) {
       return camelCased.replace(/([A-Z])/g, function (match) {
@@ -213,14 +194,13 @@ onefold_js = function () {
       });
     }
   };
-  onefold_js_internal = function (arrays, functions, objects, strings) {
+  onefold_js_internal = function (arrays, objects, strings) {
     return {
       arrays: arrays,
-      functions: functions,
       objects: objects,
       strings: strings
     };
-  }(onefold_js_arrays, onefold_js_functions, onefold_js_objects, onefold_js_strings);
+  }(onefold_js_arrays, onefold_js_objects, onefold_js_strings);
   onefold_js = function (main) {
     return main;
   }(onefold_js_internal);
@@ -278,9 +258,9 @@ stringifyable = function (onefold_js) {
       makeComparator(result);
       makeStringifyable(result, function () {
         return {
-          type: 'by-function-comparator',
-          function: fn.stringifyable,
-          comparator: comparator.stringifyable
+          'type': 'by-function-comparator',
+          'function': fn.stringifyable,
+          'comparator': comparator.stringifyable
         };
       });
       return result;
@@ -292,8 +272,8 @@ stringifyable = function (onefold_js) {
       makeComparator(result, comparator);
       makeStringifyable(result, function () {
         return {
-          type: 'reversed-comparator',
-          comparator: comparator.stringifyable
+          'type': 'reversed-comparator',
+          'comparator': comparator.stringifyable
         };
       });
       return result;
@@ -304,14 +284,14 @@ stringifyable = function (onefold_js) {
     };
     makeComparator(naturalComparator);
     makeStringifyable(naturalComparator, function () {
-      return { type: 'natural-comparator' };
+      return { 'type': 'natural-comparator' };
     });
     var indifferentComparator = function (a, b) {
       return 0;
     };
     makeComparator(indifferentComparator);
     makeStringifyable(indifferentComparator, function () {
-      return { type: 'indifferent-comparator' };
+      return { 'type': 'indifferent-comparator' };
     });
     return {
       indifferent: indifferentComparator,
@@ -333,13 +313,13 @@ stringifyable = function (onefold_js) {
     return {
       propertyAccessor: function (propertyName) {
         var fn = function (owner) {
-          return owner[propertyName];
+          return propertyName.indexOf('.') == -1 ? owner[propertyName] : eval('owner.' + propertyName);
         };
         makeFunction(fn);
         makeStringifyable(fn, function () {
           return {
-            type: 'property-accessor',
-            propertyName: propertyName
+            'type': 'property-accessor',
+            'propertyName': propertyName
           };
         });
         return fn;
@@ -407,14 +387,14 @@ stringifyable = function (onefold_js) {
     };
     makePredicate(alwaysFalse);
     makeStringifyable(alwaysFalse, function () {
-      return { type: 'always-false-predicate' };
+      return { 'type': 'always-false-predicate' };
     });
     var alwaysTrue = function () {
       return true;
     };
     makePredicate(alwaysTrue);
     makeStringifyable(alwaysTrue, function () {
-      return { type: 'always-true-predicate' };
+      return { 'type': 'always-true-predicate' };
     });
     function andPredicate(components) {
       if (!components.length)
@@ -443,9 +423,9 @@ stringifyable = function (onefold_js) {
       makePredicate(result);
       makeStringifyable(result, function () {
         return {
-          type: 'by-function-predicate',
-          function: fn.stringifyable,
-          predicate: predicate.stringifyable
+          'type': 'by-function-predicate',
+          'function': fn.stringifyable,
+          'predicate': predicate.stringifyable
         };
       });
       return result;
@@ -457,8 +437,8 @@ stringifyable = function (onefold_js) {
       makePredicate(result, predicate);
       makeStringifyable(result, function () {
         return {
-          type: 'negated-predicate',
-          predicate: predicate.stringifyable
+          'type': 'negated-predicate',
+          'predicate': predicate.stringifyable
         };
       });
       return result;
@@ -503,10 +483,10 @@ stringifyable = function (onefold_js) {
         makePredicate(result);
         makeStringifyable(result, function () {
           return {
-            type: 'regular-expression-predicate',
-            regularExpression: regularExpression.source,
-            caseSensitive: !regularExpression.ignoreCase,
-            multiline: regularExpression.multiline
+            'type': 'regular-expression-predicate',
+            'regularExpression': regularExpression.source,
+            'caseSensitive': !regularExpression.ignoreCase,
+            'multiline': regularExpression.multiline
           };
         });
         return result;
@@ -546,7 +526,7 @@ ko_grid_sorting_sorting = function (module, koGrid, stringifyable) {
       function defaultComparator(column) {
         var propertyName = column.property;
         var accessor = function (row) {
-          return valueOf(row[propertyName]);
+          return valueOf(propertyName.indexOf('.') == -1 ? row[propertyName] : eval('row.' + propertyName));
         };
         stringifyable.makeStringifyable(accessor, function () {
           return stringifyable.functions.propertyAccessor(column.property).stringifyable;
